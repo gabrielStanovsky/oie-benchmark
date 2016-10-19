@@ -1,7 +1,5 @@
 # oie-benchmark
 
-# oie-benchmark
-
 Code for converting QA-SRL to Open-IE extractions and comparing Open-IE extractors against this corpus.
 This is the implementation of the algorithms described in our [EMNLP2016 paper] (https://www.cs.bgu.ac.il/~gabriels/emnlp2016.pdf).
 
@@ -45,7 +43,9 @@ Currently, we support the following output formats:
 * [Stanford Open IE](http://nlp.stanford.edu/software/openie.html)
 
 To compare your extractor:
+
 1. Run your extractor on the sentences in "oie_corpus/oie_input" (these are the row sentences) and store the output into "*your_output*.txt"
+
 2. Depending on your output format, you can get a precision-recall curve by running [benchmark.py](benchmark.py):
 ``` 
 Usage:
