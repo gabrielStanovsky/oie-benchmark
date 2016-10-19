@@ -1,5 +1,18 @@
-''' Usage:
+''' 
+Usage:
    goldComparator --gold=GOLD_OIE --out=OUTPUT_DIR [--stanford=STANFORD_OIE] [--ollie=OLLIE_OIE] [--reverb=REVERB_OIE] [--clausie=CLAUSIE_OIE] [--openiefour=OPENIEFOUR_OIE] [--props=PROPS_OIE] 
+
+Options:
+  --gold   The gold reference Open IE file (by default should be under ./oie_corpus/all.oie.
+  --out    The output folder, into which the precision recall curves will be written (one file per system).
+  --clausie=CLAUSIE_OIE        Read ClausIE format from file CLAUSIE_OIE.
+  --ollie=OLLIE_OIE            Read OLLIE format from file OLLIE_OIE.
+  --openiefour=OPENIEFOUR_OIE  Read Open IE 4 format from file OPENIEFOUR_OIE.
+  --props=PROPS_OIE            Read PropS format from file PROPS_OIE
+  --reverb=REVERB_OIE          Read ReVerb format from file REVERB_OIE
+  --stanford=STANFORD_OIE      Read Stanford format from file STANFORD_OIE
+
+
 '''
 import docopt
 import string
