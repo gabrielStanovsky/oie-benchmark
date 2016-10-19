@@ -2,11 +2,24 @@
 
 # oie-benchmark
 
-Code for converting QA-SRL to Open-IE extractions, and for comparing existing Open-IE extractors against this corpus.
+Code for converting QA-SRL to Open-IE extractions and comparing Open-IE extractors against this corpus.
 This is the implementation of the algorithms described in our [EMNLP2016 paper] (https://www.cs.bgu.ac.il/~gabriels/emnlp2016.pdf).
 
 Citing
 ------
+If you use this software, please cite:
+```
+@InProceedings{Stanovsky2016EMNLP,
+  author    = {Gabriel Stanovsky and Ido Dagan},
+  title     = {Creating a Large Benchmark for Open Information Extraction},
+  booktitle = {Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  month     = {November},
+  year      = {2016},
+  address   = {Austin, Texas},
+  publisher = {Association for Computational Linguistics},
+  pages     = {(to appear)},
+}
+```
 
 
 Converting QA-SRL to Open IE
