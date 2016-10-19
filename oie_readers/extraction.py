@@ -34,7 +34,6 @@ class Extraction:
             self.questions[question] = self.questions.get(question,[]) + [Argument(arg)]
     
     def noPronounArgs(self):
-        return True
         for (a, _) in self.args:
             (_, pos) = nltk.pos_tag([a.lstrip().rstrip()])[0]
             if 'PRP' in pos:
