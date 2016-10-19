@@ -44,7 +44,7 @@ Currently, we support the following output formats:
 
 To compare your extractor:
 
-1. Run your extractor on the sentences in "oie_corpus/oie_input" (these are the row sentences) and store the output into "*your_output*.txt"
+1. Run your extractor on the sentences in [oie_corpus/oie_input.txt](oie_corpus/oie_input.txt) (these are the row sentences) and store the output into "*your_output*.txt"
 
 2. Depending on your output format, you can get a precision-recall curve by running [benchmark.py](benchmark.py):
 ``` 
