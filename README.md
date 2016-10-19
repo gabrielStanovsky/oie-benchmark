@@ -30,7 +30,7 @@ After obtaining the QA-SRL corpus, run:
 If everything runs fine, this should create an Open IE corpus (split between wiki and newswire domain) under [oie_corpus](oie_corpus).
 
 
-Evaluating an Open IE Extractor:
+Evaluating an Open IE Extractor
 -----------------------------
 After converting QA-SRL to Open IE, you can now automatically evaluate your Open-IE system against this corpus.
 Currently, we support the following output formats:
