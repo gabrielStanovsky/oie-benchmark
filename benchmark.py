@@ -59,8 +59,6 @@ class Benchmark:
                 continue
                 
             predictedExtractions = predicted[sent]
-
-            
             
             for goldEx in goldExtractions:
                 correctTotal += 1
