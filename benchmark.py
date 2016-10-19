@@ -1,18 +1,16 @@
 ''' 
 Usage:
-   goldComparator --gold=GOLD_OIE --out=OUTPUT_DIR [--stanford=STANFORD_OIE] [--ollie=OLLIE_OIE] [--reverb=REVERB_OIE] [--clausie=CLAUSIE_OIE] [--openiefour=OPENIEFOUR_OIE] [--props=PROPS_OIE] 
+   benchmark --gold=GOLD_OIE --out=OUTPUT_FILE (--stanford=STANFORD_OIE | --ollie=OLLIE_OIE |--reverb=REVERB_OIE | --clausie=CLAUSIE_OIE | --openiefour=OPENIEFOUR_OIE | --props=PROPS_OIE)
 
 Options:
-  --gold   The gold reference Open IE file (by default should be under ./oie_corpus/all.oie.
-  --out    The output folder, into which the precision recall curves will be written (one file per system).
+  --gold=GOLD_OIE              The gold reference Open IE file (by default, it should be under ./oie_corpus/all.oie).
+  --out-OUTPUT_FILE            The output file, into which the precision recall curve will be written.
   --clausie=CLAUSIE_OIE        Read ClausIE format from file CLAUSIE_OIE.
   --ollie=OLLIE_OIE            Read OLLIE format from file OLLIE_OIE.
   --openiefour=OPENIEFOUR_OIE  Read Open IE 4 format from file OPENIEFOUR_OIE.
   --props=PROPS_OIE            Read PropS format from file PROPS_OIE
   --reverb=REVERB_OIE          Read ReVerb format from file REVERB_OIE
   --stanford=STANFORD_OIE      Read Stanford format from file STANFORD_OIE
-
-
 '''
 import docopt
 import string
@@ -32,8 +30,8 @@ from oie_readers.propsReader import PropSReader
 from oie_readers.goldReader import GoldReader
 from matcher import Matcher
 
-class GoldComparator:
-    ''' Comapre a gold OIE dataset against a predicted equivalent '''
+class Benchmark:
+    ''' Compare the gold OIE dataset against a predicted equivalent '''
     def __init__(self, gold_fn):
         ''' Load gold Open IE, this will serve to compare against using the compare function '''
         gr = GoldReader() 
@@ -49,8 +47,8 @@ class GoldComparator:
         
         correctTotal = 0
         unmatchedCount = 0        
-        predicted = GoldComparator.normalizeDict(predicted)
-        gold = GoldComparator.normalizeDict(self.gold)
+        predicted = Benchmark.normalizeDict(predicted)
+        gold = Benchmark.normalizeDict(self.gold)
                 
         for sent, goldExtractions in gold.items():
             if sent not in predicted:
@@ -98,7 +96,7 @@ class GoldComparator:
         
         # recall on y_true, y  (r')_scores computes |covered by extractor| / |True in what's covered by extractor|
         # to get to true recall we do r' * (|True in what's covered by extractor| / |True in gold|) = |true in what's covered| / |true in gold|
-        p, r = GoldComparator.prCurve(np.array(y_true), np.array(y_scores),
+        p, r = Benchmark.prCurve(np.array(y_true), np.array(y_scores),
                        recallMultiplier = ((correctTotal - unmatchedCount)/float(correctTotal)))
 
         # write PR to file
@@ -117,27 +115,27 @@ class GoldComparator:
     # Helper functions:
     @staticmethod
     def normalizeDict(d):
-        return dict([(GoldComparator.normalizeKey(k), v) for k, v in d.items()])
+        return dict([(Benchmark.normalizeKey(k), v) for k, v in d.items()])
     
     @staticmethod
     def normalizeKey(k):
-        return GoldComparator.removePunct(unicode(GoldComparator.PTB_unescape(k.replace(' ','')), errors = 'ignore'))
+        return Benchmark.removePunct(unicode(Benchmark.PTB_unescape(k.replace(' ','')), errors = 'ignore'))
 
     @staticmethod
     def PTB_escape(s):
-        for u, e in GoldComparator.PTB_ESCAPES:
+        for u, e in Benchmark.PTB_ESCAPES:
             s = s.replace(u, e)
         return s
     
     @staticmethod
     def PTB_unescape(s):
-        for u, e in GoldComparator.PTB_ESCAPES:
+        for u, e in Benchmark.PTB_ESCAPES:
             s = s.replace(e, u)
         return s
     
     @staticmethod
     def removePunct(s):
-        return GoldComparator.regex.sub('', s)
+        return Benchmark.regex.sub('', s)
     
     # CONSTANTS
     regex = re.compile('[%s]' % re.escape(string.punctuation))
@@ -156,50 +154,37 @@ if __name__ == '__main__':
     args = docopt.docopt(__doc__)
     logging.debug(args)
     
-    systems = []
     if args['--stanford']:
-        s = StanfordReader()
-        s.read(args['--stanford'])
-        systems.append(s)
+        predicted = StanfordReader()
+        predicted.read(args['--stanford'])
     
     if args['--props']:
-        p = PropSReader()
-        p.read(args['--props'])
-        systems.append(p)
+        predicted = PropSReader()
+        predicted.read(args['--props'])
        
     if args['--ollie']:
-        o = OllieReader()
-        o.read(args['--ollie'])
-        systems.append(o)
+        predicted = OllieReader()
+        predicted.read(args['--ollie'])
     
     if args['--reverb']:
-        r = ReVerbReader()
-        r.read(args['--reverb'])
-        systems.append(r)
+        predicted = ReVerbReader()
+        predicted.read(args['--reverb'])
     
     if args['--clausie']:
-        c = ClausieReader()
-        c.read(args['--clausie'])
-        systems.append(c)
+        predicted = ClausieReader()
+        predicted.read(args['--clausie'])
         
     if args['--openiefour']:
-        o4 = OpenieFourReader()
-        o4.read(args['--openiefour'])
-        systems.append(o4)
-       
+        predicted = OpenieFourReader()
+        predicted.read(args['--openiefour'])
 
-    if not systems:
-        logging.warning("No Open IE system was given.")
+    b = Benchmark(args['--gold'])
+    out_filename = args['--out']
 
-
-    gc = GoldComparator(args['--gold'])
-    output_dir = args['--out']
-    for oie in systems:
-        out_filename = '{}/{}.dat'.format(output_dir, oie.name)
-        logging.info("Writing PR curve of {} to {}".format(oie.name, out_filename))
-        gc.compare(predicted = oie.oie, 
-                   matchingFunc = Matcher.lexicalMatch,
-                   output_fn = out_filename)
+    logging.info("Writing PR curve of {} to {}".format(predicted.name, out_filename))
+    b.compare(predicted = predicted.oie, 
+               matchingFunc = Matcher.lexicalMatch,
+               output_fn = out_filename)
     
         
         
