@@ -39,7 +39,7 @@ class Benchmark:
         self.gold = gr.oie
 
     def compare(self, predicted, matchingFunc, output_fn):
-        ''' Compare gold against predicted using a specified mode. 
+        ''' Compare gold against predicted using a specified matching function. 
             Outputs PR curve to output_fn '''
         
         y_true = []

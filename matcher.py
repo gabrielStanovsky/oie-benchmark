@@ -37,7 +37,10 @@ class Matcher:
             for w2 in sEx:
                 if w1 == w2:
                     count += 1
- 
+                    
+        # We check how well does the extraction lexically cover the reference
+        # Note: this is somewhat lenient as it doesn't penalize the extraction for
+        #       being too long
         coverage = float(count) / len(sRef)
 
         
@@ -49,7 +52,7 @@ class Matcher:
     
     # CONSTANTS
     BLEU_THRESHOLD = 0.4
-    LEXICAL_THRESHOLD = 0.5
+    LEXICAL_THRESHOLD = 0.5 # Note: changing this value didn't change the ordering of the tested systems
     stopwords = stopwords.words('english') + list(string.punctuation)
 
 
