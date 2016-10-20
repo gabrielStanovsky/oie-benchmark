@@ -1,7 +1,7 @@
 # oie-benchmark
 
-Code for converting QA-SRL to Open-IE extractions and comparing Open-IE extractors against this corpus.
-This is the implementation of the algorithms described in our [EMNLP2016 paper] (https://www.cs.bgu.ac.il/~gabriels/emnlp2016.pdf).
+Code for converting QA-SRL annotations to Open-IE extractions and comparing Open-IE parsers against a converted benchmark corpus.
+This is an implementation of the algorithms described in our [EMNLP2016 paper] (https://www.cs.bgu.ac.il/~gabriels/emnlp2016.pdf).
 
 Citing
 ------
@@ -21,7 +21,7 @@ If you use this software, please cite:
 
 Converting QA-SRL to Open IE
 ----------------------------
-To run the code, you should first obtain the QA-SRL corpus (from [here](https://dada.cs.washington.edu/qasrl/#dataset)) and place it under [QASRL-full](QASRL-full).
+To run the code, you should first obtain the **full** [QA-SRL corpus](https://dada.cs.washington.edu/qasrl/#dataset)) and place it under [QASRL-full](QASRL-full).
 After obtaining the QA-SRL corpus, run:
 ```
 ./create_oie_corpus.sh
@@ -29,11 +29,10 @@ After obtaining the QA-SRL corpus, run:
 
 If everything runs fine, this should create an Open IE corpus (split between wiki and newswire domain) under [oie_corpus](oie_corpus).
 
-
 Evaluating an Open IE Extractor
 -----------------------------
 After converting QA-SRL to Open IE, you can now automatically evaluate your Open-IE system against this corpus.
-Currently, we support the following output formats:
+Currently, we support the following Open IE formats:
 
 * [ClausIE](https://www.mpi-inf.mpg.de/departments/databases-and-information-systems/software/clausie/)
 * [OLLIE](http://knowitall.github.io/ollie/)
@@ -71,7 +70,7 @@ systems in [systems_output](systems_output).
 You can give each of these files to [benchmark.py](benchmark.py), to
 get the corresponding precision recall curve.
 
-For example, to can to evaluate Stanford Open IE output, run:
+For example, to evaluate Stanford Open IE output, run:
 ```
 python benchmark.py --gold=./oie_corpus/all.oie --out=./StanfordPR.dat --stanford=./systems_output/stanford_output.txt
 ```
