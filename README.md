@@ -21,7 +21,7 @@ If you use this software, please cite:
 
 Converting QA-SRL to Open IE
 ----------------------------
-To run the code, you should first obtain the **full** [QA-SRL corpus](https://dada.cs.washington.edu/qasrl/#dataset)) and place it under [QASRL-full](QASRL-full).
+To run the code, you should first obtain the **full** [QA-SRL corpus](https://dada.cs.washington.edu/qasrl/#dataset) and place it under [QASRL-full](QASRL-full).
 After obtaining the QA-SRL corpus, run:
 ```
 ./create_oie_corpus.sh
