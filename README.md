@@ -75,3 +75,22 @@ For example, to evaluate Stanford Open IE output, run:
 python benchmark.py --gold=./oie_corpus/all.oie --out=./StanfordPR.dat --stanford=./systems_output/stanford_output.txt
 ```
 
+Plotting
+--------
+
+You can plot several inputs of [benchmark.py](benchmark.py), by using [pr_plot.py](pr_plot.py):
+
+```
+Usage:
+   pr_plot --in=DIR_NAME --out=OUTPUT_FILENAME 
+
+Options:
+  --in=DIR_NAME            Folder in which to search for *.dat file, all of which should be in a P/R column format, and will be included in trend line with their filename
+  --out=OUTPUT_FILENAME    Output filename, filetype will determine the format. Possible formats: pdf, pgf, png
+```
+
+Finally, try running:
+```[eval.sh](eval.sh) ```
+This will recreate the Precision Recall figure from the paper using the output of OIE parsers in [systems_output](systems_output)
+
+
