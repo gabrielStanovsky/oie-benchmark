@@ -78,14 +78,14 @@ python benchmark.py --gold=./oie_corpus/all.oie --out=./StanfordPR.dat --stanfor
 Plotting
 --------
 
-You can plot several inputs of [benchmark.py](benchmark.py), by using [pr_plot.py](pr_plot.py):
+You can plot together multiple outputs of [benchmark.py](benchmark.py), by using [pr_plot.py](pr_plot.py):
 
 ```
 Usage:
    pr_plot --in=DIR_NAME --out=OUTPUT_FILENAME 
 
 Options:
-  --in=DIR_NAME            Folder in which to search for *.dat file, all of which should be in a P/R column format, and will be included in trend line with their filename
+  --in=DIR_NAME            Folder in which to search for *.dat files, all of which should be in a P/R column format (outputs from benchmark.py).
   --out=OUTPUT_FILENAME    Output filename, filetype will determine the format. Possible formats: pdf, pgf, png
 ```
 

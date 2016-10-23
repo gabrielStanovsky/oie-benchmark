@@ -2,7 +2,7 @@
    pr_plot --in=DIR_NAME --out=OUTPUT_FILENAME 
 
 Options:
-  --in=DIR_NAME            Folder in which to search for *.dat file, all of which should be in a P/R column format, and will be included in trend line with their filename
+  --in=DIR_NAME            Folder in which to search for *.dat files, all of which should be in a P/R column format (outputs from benchmark.py)
   --out=OUTPUT_FILENAME    Output filename, filetype will determine the format. Possible formats: pdf, pgf, png
 
 
