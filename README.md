@@ -91,7 +91,9 @@ Options:
 
 Finally, try running:
 
-```./eval.sh```
+```
+./eval.sh
+```
 
 This will create the [Precision Recall figure](./eval/eval.png) using the output of OIE parsers in [systems_output](systems_output).
 
