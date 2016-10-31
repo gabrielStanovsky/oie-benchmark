@@ -52,7 +52,7 @@ Usage:
 
 Options:
   --gold=GOLD_OIE              The gold reference Open IE file (by default, it should be under ./oie_corpus/all.oie).
-  --out-OUTPUT_FILE            The output file, into which the precision recall curve will be written.
+  --out=OUTPUT_FILE            The output file, into which the precision recall curve will be written.
   --clausie=CLAUSIE_OIE        Read ClausIE format from file CLAUSIE_OIE.
   --ollie=OLLIE_OIE            Read OLLIE format from file OLLIE_OIE.
   --openiefour=OPENIEFOUR_OIE  Read Open IE 4 format from file OPENIEFOUR_OIE.
