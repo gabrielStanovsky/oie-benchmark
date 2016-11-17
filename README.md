@@ -22,8 +22,7 @@ If you use this software, please cite:
 Requirements
 ------------
 Python 2.7, tested on Ubuntu.
-
-You can see my python packages [here](requirements.txt).
+See python packages [here](requirements.txt).
 
 Additional help can be found in the [FAQ section](faq.txt).
 
