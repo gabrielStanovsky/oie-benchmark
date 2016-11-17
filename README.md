@@ -19,6 +19,12 @@ If you use this software, please cite:
 }
 ```
 
+Requirements
+------------
+Uses Python 2.7, tested on Ubuntu.
+You can see my python packages [here](requirements.txt).
+Additional help can be found in the [FAQ section](faq.txt).
+
 Converting QA-SRL to Open IE
 ----------------------------
 To run the code, you should first obtain the **full** [QA-SRL corpus](https://dada.cs.washington.edu/qasrl/#dataset) and place it under [QASRL-full](QASRL-full).
