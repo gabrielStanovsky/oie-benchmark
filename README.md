@@ -21,8 +21,10 @@ If you use this software, please cite:
 
 Requirements
 ------------
-Uses Python 2.7, tested on Ubuntu.
+Python 2.7, tested on Ubuntu.
+
 You can see my python packages [here](requirements.txt).
+
 Additional help can be found in the [FAQ section](faq.txt).
 
 Converting QA-SRL to Open IE
