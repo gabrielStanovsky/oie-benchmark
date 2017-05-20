@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 mkdir -p ./oie_corpus/newswire
 mkdir -p ./oie_corpus/wiki
 echo "Extracting from newswire..."

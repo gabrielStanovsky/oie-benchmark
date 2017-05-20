@@ -87,4 +87,7 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Proejct specific
 QASRL-full/
+oie_corpus/
