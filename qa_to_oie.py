@@ -103,6 +103,11 @@ class Qa2OIE:
                 answers = self.consolidate_answers(info[-1].split("###"))
                 curArgs.append(zip([question]*len(answers), answers))
                 lc -= 1
+                if (lc == 2):
+                    # Reached the end of this predicate's questions
+                    sentQAs.append((curPred, curArgs))
+                    curArgs = []
+        # Flush
         if sentQAs:
             ret += self.printSent(curSent, sentQAs)
 
@@ -128,6 +133,11 @@ class Qa2OIE:
 
         
     def consolidate_answers(self, answers):
+        """
+        For a given list of answers, returns only minimal answers - e.g., ones which do not
+        contain any other answer in the set.
+        This deals with certain QA-SRL anntoations which include a longer span than that is needed.
+        """
         ret = []
         for i, first_answer in enumerate(answers):
             includeFlag = True
@@ -179,8 +189,6 @@ def encodeQuestion(question, mask):
     encoding = "\t".join(info)
     (val, count) = questionsDic.get(encoding, (len(questionsDic), 0)) # get the encoding of a question, and the count of times it appeared
     questionsDic[encoding] = (val, count+1)
-    # remove underscores just for better readability
-#     ret = '{0}'.format(" ".join([x for x in info if x != "_"]))  
     ret = " ".join(info)  
     return ret
 
