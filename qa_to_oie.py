@@ -20,20 +20,20 @@ get_default_mask = lambda : [PASS_ALL] * 8
 
 
 class Qa2OIE:
-    
+
     # Static variables
     extractions_counter = 0
-    
+
     def __init__(self, qaFile):
         ''' loads qa file and converts it into  open IE '''
         self.dic = self.loadFile(self.getExtractions(qaFile))
-    
+
     def loadFile(self, lines):
         sent = ''
         d = {}
 
         indsForQuestions = defaultdict(lambda: set())
-                
+
         for line in lines.split('\n'):
             line = line.strip()
             if not line:
@@ -46,7 +46,7 @@ class Qa2OIE:
                 sent = line
                 d[sent] = []
                 indsForQuestions = defaultdict(lambda: set())
-                
+
             else:
                 pred = data[0]
                 cur = Extraction((pred, all_index(sent, pred, matchCase = False)), sent, confidence = 1.0)
@@ -59,17 +59,20 @@ class Qa2OIE:
                     if cur.noPronounArgs():
                         d[sent].append(cur)
         return d
-    
+
     def getExtractions(self, qa_srl_path, mask = get_default_mask()):
-        qa_input = open(qa_srl_path, 'r')
+        """
+        Parse a QA-SRL file (with raw sentences) at qa_srl_path.
+        Returns output which can in turn serve as input for load_file.
+        """
         lc = 0
         curArgs = []
         sentQAs = []
         curPred = ""
         curSent = ""
         ret = ''
-        
-        for line in qa_input:
+
+        for line in open(qa_srl_path, 'r'):
             line = line.strip()
             info = line.strip().split("\t")
             if lc == 0:
@@ -102,9 +105,9 @@ class Qa2OIE:
                 lc -= 1
         if sentQAs:
             ret += self.printSent(curSent, sentQAs)
-        qa_input.close()
+
         return ret
-        
+
     def printSent(self, sent, sentQAs):
         ret =  sent + "\n"
         for pred, predQAs in sentQAs:
@@ -188,11 +191,11 @@ def all_index(s, ss, matchCase = True, ignoreSpaces = True):
     if not matchCase:
         s = s.lower()
         ss = ss.lower()
-        
+
     if ignoreSpaces:
         s = s.replace(' ', '')
         ss = ss.replace(' ','')
-    
+
     return [m.start() for m in re.finditer(re.escape(ss), s)]
 
 def longest_common_substring(s1, s2):
@@ -207,15 +210,16 @@ def longest_common_substring(s1, s2):
                     x_longest = x
             else:
                 m[x][y] = 0
-                
+
     start = x_longest - longest
     end = x_longest
-    
+
     return s1[start:end]
 
-## MAIN 
+## MAIN
 if __name__ == '__main__':
     logging.basicConfig(level = logging.CRITICAL)
+    # Parse arguments and call conversions
     args = docopt(__doc__)
     logging.debug(args)
     q = Qa2OIE(args['--in'])
@@ -223,4 +227,4 @@ if __name__ == '__main__':
     if args['--oieinput']:
         q.createOIEInput(args['--oieinput'])
 
-             
+
