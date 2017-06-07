@@ -22,9 +22,9 @@ class Extraction:
         for x in self.pred[1]:
             for y in arg.indices:
                 dists.append(abs(x - y))
-                 
+
         return min(dists)
-    
+
     def argsByDistFromPred(self, question):
         return sorted(self.questions[question], key = lambda arg: self.distArgFromPred(arg))
 
@@ -32,42 +32,42 @@ class Extraction:
         self.args.append(arg)
         if question:
             self.questions[question] = self.questions.get(question,[]) + [Argument(arg)]
-    
+
     def noPronounArgs(self):
         for (a, _) in self.args:
             (_, pos) = nltk.pos_tag([a.lstrip().rstrip()])[0]
             if 'PRP' in pos:
                 return False
         return True
-        
+
     def isContiguous(self):
         return all([indices for (_, indices) in self.args])
 
     def toBinary(self):
         ''' Try to represent this extraction's arguments as binary
         If fails, this function will return an empty list.  '''
-        
+
         ret = [self.elementToStr(self.pred)]
-         
+
         if len(self.args) == 2:
             # we're in luck
             return ret + [self.elementToStr(arg) for arg in self.args]
-        
+
         return []
-        
+
         if not self.isContiguous():
             # give up on non contiguous arguments (as we need indexes)
             return []
-        
+
         # otherwise, try to merge based on indices
-        # TODO: you can explore other methods for doing this        
+        # TODO: you can explore other methods for doing this
         binarized = self.binarizeByIndex()
-        
+
         if binarized:
             return ret + binarized
-        
+
         return []
-        
+
 
     def elementToStr(self, elem):
         ''' formats an extraction element (pred or arg) as a raw string
