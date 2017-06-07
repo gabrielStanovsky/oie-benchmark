@@ -1,10 +1,23 @@
-# oie-benchmark
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Introduction](#introduction)
+  - [Citing](#citing)
+- [Requirements](#requirements)
+- [Converting QA-SRL to Open IE](#converting-qa-srl-to-open-ie)
+- [Evaluating an Open IE Extractor](#evaluating-an-open-ie-extractor)
+- [Evaluating Existing Systems](#evaluating-existing-systems)
+- [Plotting](#plotting)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Introduction
 
 Code for converting QA-SRL annotations to Open-IE extractions and comparing Open-IE parsers against a converted benchmark corpus.
 This is an implementation of the algorithms described in our [EMNLP2016 paper] (https://gabrielstanovsky.github.io/assets/papers/emnlp16a/paper.pdf).
 
-Citing
-------
+### Citing
 If you use this software, please cite:
 ```
 @InProceedings{Stanovsky2016EMNLP,
@@ -19,15 +32,13 @@ If you use this software, please cite:
 }
 ```
 
-Requirements
-------------
+## Requirements
 Python 2.7, tested on Ubuntu.
 See required python packages [here](requirements.txt).
 
 Additional help can be found in the [FAQ section](faq.txt).
 
-Converting QA-SRL to Open IE
-----------------------------
+## Converting QA-SRL to Open IE
 To run the code, you should first obtain the **full** [QA-SRL corpus](https://dada.cs.washington.edu/qasrl/#dataset) and place it under [QASRL-full](QASRL-full).
 After obtaining the QA-SRL corpus, run:
 ```
@@ -54,8 +65,8 @@ Please make sure that your folders adhere to this structure and naming conventio
 Otherwise, you can invoke the conversion separately for each QA-SRL file by
 running ```qa_to_oie.py --in=INPUT_FILE --out=OUTPUT_FILE```. Where INPUT_FILE is the QA-SRL file, and the OUTPUT_FILE is where the Open IE file will be created. You can see that the script above just makes separate calls to this file, and then concatenates the outputs.
 
-Evaluating an Open IE Extractor
------------------------------
+## Evaluating an Open IE Extractor
+
 After converting QA-SRL to Open IE, you can now automatically evaluate your Open-IE system against this corpus.
 Currently, we support the following Open IE formats:
 
@@ -86,8 +97,7 @@ Options:
   --stanford=STANFORD_OIE      Read Stanford format from file STANFORD_OIE
 ```
 
-Evaluating Existing Systems
----------------------------
+## Evaluating Existing Systems
 
 In the course of this work we tested the above mentioned Open IE parsers against our benchmark.
 We provide the output files (i.e., Open IE extractions) of each of these
@@ -100,8 +110,7 @@ For example, to evaluate Stanford Open IE output, run:
 python benchmark.py --gold=./oie_corpus/all.oie --out=./StanfordPR.dat --stanford=./systems_output/stanford_output.txt
 ```
 
-Plotting
---------
+## Plotting
 
 You can plot together multiple outputs of [benchmark.py](benchmark.py), by using [pr_plot.py](pr_plot.py):
 
