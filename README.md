@@ -36,6 +36,24 @@ After obtaining the QA-SRL corpus, run:
 
 If everything runs fine, this should create an Open IE corpus (split between wiki and newswire domain) under [oie_corpus](oie_corpus).
 
+**Note**:
+The script currently expects the following folder structure:
+```
+QASRL-full/:
+newswire/  README.md  wiki/
+
+QASRL-full/newswire:
+propbank.dev.qa  propbank.qa  propbank.test.qa  propbank.train.qa
+
+QASRL-full/wiki:
+wiki1.dev.qa  wiki1.qa  wiki1.test.qa  wiki1.train.qa
+```
+
+Please make sure that your folders adhere to this structure and naming conventions.
+
+Otherwise, you can invoke the conversion separately for each QA-SRL file by
+running ```qa_to_oie.py --in=INPUT_FILE --out=OUTPUT_FILE```. Where INPUT_FILE is the QA-SRL file, and the OUTPUT_FILE is where the Open IE file will be created. You can see that the script above just makes separate calls to this file, and then concatenates the outputs.
+
 Evaluating an Open IE Extractor
 -----------------------------
 After converting QA-SRL to Open IE, you can now automatically evaluate your Open-IE system against this corpus.
