@@ -34,10 +34,15 @@ class Extraction:
             self.questions[question] = self.questions.get(question,[]) + [Argument(arg)]
 
     def noPronounArgs(self):
+        """
+        Returns True iff all of this extraction's arguments are not pronouns.
+        """
         for (a, _) in self.args:
-            (_, pos) = nltk.pos_tag([a.lstrip().rstrip()])[0]
-            if 'PRP' in pos:
-                return False
+            tokenized_arg = nltk.word_tokenize(a)
+            if len(tokenized_arg) == 1:
+                _, pos_tag = nltk.pos_tag(tokenized_arg)[0]
+                if ('PRP' in pos_tag):
+                    return False
         return True
 
     def isContiguous(self):
