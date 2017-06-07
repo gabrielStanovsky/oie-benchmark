@@ -6,6 +6,7 @@
   - [Citing](#citing)
 - [Requirements](#requirements)
 - [Converting QA-SRL to Open IE](#converting-qa-srl-to-open-ie)
+  - [Expected Folder Structure](#expected-folder-structure)
 - [Evaluating an Open IE Extractor](#evaluating-an-open-ie-extractor)
 - [Evaluating Existing Systems](#evaluating-existing-systems)
 - [Plotting](#plotting)
@@ -47,7 +48,7 @@ After obtaining the QA-SRL corpus, run:
 
 If everything runs fine, this should create an Open IE corpus (split between wiki and newswire domain) under [oie_corpus](oie_corpus).
 
-**Note**:
+### Expected Folder Structure
 The script currently expects the following folder structure:
 ```
 QASRL-full/:
