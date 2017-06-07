@@ -16,7 +16,7 @@
 ## Introduction
 
 Code for converting QA-SRL annotations to Open-IE extractions and comparing Open-IE parsers against a converted benchmark corpus.
-This is an implementation of the algorithms described in our [EMNLP2016 paper] (https://gabrielstanovsky.github.io/assets/papers/emnlp16a/paper.pdf).
+This is an implementation of the algorithms described in our [EMNLP2016 paper](https://gabrielstanovsky.github.io/assets/papers/emnlp16a/paper.pdf).
 
 ### Citing
 If you use this software, please cite:
