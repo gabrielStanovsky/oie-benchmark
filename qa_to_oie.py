@@ -87,8 +87,8 @@ class Qa2OIE:
                 curSent = line
                 lc += 1
                 sentQAs = []
-            elif lc == 2:  
-                if curArgs: 
+            elif lc == 2:
+                if curArgs:
                     sentQAs.append((curPred, curArgs))
                     curArgs = []
                 # Update line counter.
@@ -138,19 +138,19 @@ class Qa2OIE:
             if includeFlag:
                 ret.append(first_answer)
         return ret
-    
+
     def createOIEInput(self, fn):
         with open(fn, 'a') as fout:
             for sent in self.dic:
                 fout.write(sent + '\n')
-                
+
     def writeOIE(self, fn):
         with open(fn, 'w') as fout:
             for sent, extractions in self.dic.iteritems():
                 for ex in extractions:
                     fout.write('{}\t{}\n'.format(escape_special_chars(sent), 
                                                  ex.__str__()))
-    
+
 # MORE HELPER 
 
 def is_str_subset(s1, s2):
