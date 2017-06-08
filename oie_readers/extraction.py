@@ -113,14 +113,46 @@ class Extraction:
             if not indices:
                 logging.debug("Empty indexes for arg {} -- backing to zero".format(arg))
                 indices = [0]
-            ls.append((arg, indices))
+            ls.append(((arg, q), indices))
         return [a for a, _ in sorted(ls, key = lambda (_, indices): min(indices))]
 
 
     
     def __str__(self):
-        return '{0}\t{1}'.format(self.elementToStr(self.pred), '\t'.join([escape_special_chars(self.elementToStr(arg)) for arg in self.getSortedArgs()]))
+        return '{0}\t{1}'.format(self.elementToStr(self.pred),
+                                 '\t'.join([escape_special_chars(augment_arg_with_question(self.elementToStr(arg),
+                                                                                           question))
+                                            for arg, question in self.getSortedArgs()]))
 
+def augment_arg_with_question(arg, question):
+    """
+    Decide what elements from the question to incorporate in the given
+    corresponding predicate
+    """
+    # Parse question
+    wh, aux, sbj, trg, obj1, pp, obj2 = map(normalize_element,
+                                            question.split(' ')[:-1]) # Last split is the question mark
+
+    # Place preporition in argument
+    # This is safer when dealing with n-ary arguments, as it's directly attaches to the
+    # appropriate argument
+    if pp and (not obj2):
+        if not(arg.startswith("{} ".format(pp))):
+            # Avoid repeating the preporition in cases where both question and answer contain it
+            return " ".join([pp,
+                             arg])
+
+    # Normal cases
+    return arg
+
+def normalize_element(elem):
+    """
+    Return a surface form of the given question element.
+    the output should be properly able to precede a predicate (or blank otherwise)
+    """
+    return elem \
+        if (elem != "_")\
+           else ""
 
 ## Helper functions
 def escape_special_chars(s):

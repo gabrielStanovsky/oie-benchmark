@@ -92,3 +92,4 @@ ENV/
 QASRL-full/
 oie_corpus/
 tmp_examples/
+*\#*

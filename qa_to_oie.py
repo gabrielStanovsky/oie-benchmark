@@ -18,7 +18,6 @@ PASS_ALL = lambda x: x
 MASK_ALL = lambda x: "_"
 get_default_mask = lambda : [PASS_ALL] * 8
 
-
 class Qa2OIE:
 
     # Static variables
@@ -73,6 +72,8 @@ class Qa2OIE:
         ret = ''
 
         for line in open(qa_srl_path, 'r'):
+            if line.startswith('#'):
+                continue
             line = line.strip()
             info = line.strip().split("\t")
             if lc == 0:
@@ -119,9 +120,9 @@ class Qa2OIE:
             for element in itertools.product(*predQAs):
                 self.encodeExtraction(element)
                 ret += "\t".join([pred] + ["\t".join(x) for x in element]) + "\n"
-        ret += "\n"  
+        ret += "\n"
         return ret
-        
+
     def encodeExtraction(self, element):
         questions = map(operator.itemgetter(0),element)
         extractionSet = set(questions)
@@ -131,7 +132,7 @@ class Qa2OIE:
         Qa2OIE.extractions_counter += 1
         extractionsDic[encoding] = (count+1, extractionSet, extractions)
 
-        
+
     def consolidate_answers(self, answers):
         """
         For a given list of answers, returns only minimal answers - e.g., ones which do not
@@ -183,13 +184,13 @@ def strictly_increasing(L):
 questionsDic = {}
 extractionsDic = {}
 
-
 def encodeQuestion(question, mask):
     info = [mask[i](x).replace(" ","_") for i,x in enumerate(question.split("\t"))]
     encoding = "\t".join(info)
-    (val, count) = questionsDic.get(encoding, (len(questionsDic), 0)) # get the encoding of a question, and the count of times it appeared
+    # get the encoding of a question, and the count of times it appeared
+    (val, count) = questionsDic.get(encoding, (len(questionsDic), 0))
     questionsDic[encoding] = (val, count+1)
-    ret = " ".join(info)  
+    ret = " ".join(info)
     return ret
 
 
