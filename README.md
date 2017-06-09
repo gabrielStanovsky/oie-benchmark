@@ -4,6 +4,7 @@
 
 - [Introduction](#introduction)
   - [Citing](#citing)
+  - [Contact](#contact)
 - [Requirements](#requirements)
 - [Converting QA-SRL to Open IE](#converting-qa-srl-to-open-ie)
   - [Expected Folder Structure](#expected-folder-structure)
@@ -32,6 +33,10 @@ If you use this software, please cite:
   pages     = {(to appear)},
 }
 ```
+
+### Contact
+Leave us a note at 
+```gabriel (dot) satanovsky (at) gmail (dot) com```
 
 ## Requirements
 Python 2.7, tested on Ubuntu.
