@@ -168,7 +168,6 @@ class Extraction:
                 # If all questions for the predicate include the same pp attachemnt -
                 # assume it's a multiword predicate
                 self.is_mwp = True # Signal to arguments that they shouldn't take the preposition
-                logging.critical("found an mwp: {}".format(questions))
                 ret.extend([pps[0], obj2s[0]])
 
         # Concat all elements in the predicate and return

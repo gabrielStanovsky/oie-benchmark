@@ -220,8 +220,6 @@ def augment_pred_with_question(pred, question):
     # Add auxiliary to the predicate
     if aux in QA_SRL_AUX_MODIFIERS:
         return " ".join([aux, pred])
-    else:
-        logging.critical("{} denied".format(aux))
 
     # Non modified predicates
     return pred
