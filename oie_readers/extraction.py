@@ -164,11 +164,11 @@ class Extraction:
                         map(itemgetter(QUESTION_OBJ2_INDEX),
                             split_questions))
 
-            if (len(set(pps)) == 1) and (len(set(obj2s)) == 1):
+            if (len(set(pps)) == 1):
                 # If all questions for the predicate include the same pp attachemnt -
                 # assume it's a multiword predicate
                 self.is_mwp = True # Signal to arguments that they shouldn't take the preposition
-                ret.extend([pps[0], obj2s[0]])
+                ret.append(pps[0])
 
         # Concat all elements in the predicate and return
         return " ".join(ret).strip()
