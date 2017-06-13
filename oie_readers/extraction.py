@@ -15,6 +15,7 @@ class Extraction:
         self.matched = []
         self.questions = {}
         self.indsForQuestions = defaultdict(lambda: set())
+        self.is_mwp = False
 
     def distArgFromPred(self, arg):
         assert(len(self.pred) == 2)
@@ -116,41 +117,91 @@ class Extraction:
             ls.append(((arg, q), indices))
         return [a for a, _ in sorted(ls, key = lambda (_, indices): min(indices))]
 
-
-    
     def __str__(self):
-        return '{0}\t{1}'.format(self.elementToStr(self.pred),
-                                 '\t'.join([escape_special_chars(augment_arg_with_question(self.elementToStr(arg),
-                                                                                           question))
+        return '{0}\t{1}'.format(self.compute_global_pred(self.elementToStr(self.pred),
+                                                          self.questions.keys()),
+                                 '\t'.join([escape_special_chars(self.augment_arg_with_question(self.elementToStr(arg),
+                                                                                                question))
                                             for arg, question in self.getSortedArgs()]))
 
-def augment_arg_with_question(arg, question):
-    """
-    Decide what elements from the question to incorporate in the given
-    corresponding predicate
-    """
-    # Parse question
-    wh, aux, sbj, trg, obj1, pp, obj2 = map(normalize_element,
-                                            question.split(' ')[:-1]) # Last split is the question mark
+    def compute_global_pred(self, surface_pred, questions):
+        """
+        Given the surface pred and all instansiations of questions,
+        make global coherence decisions regarding the final form of the predicate
+        This should hopefully take care of multi word predicates and correct inflections
+        """
+        from operator import itemgetter
+        split_surface = surface_pred.split(' ')
 
-    # Place preporition in argument
-    # This is safer when dealing with n-ary arguments, as it's directly attaches to the
-    # appropriate argument
-    if pp and (not obj2):
-        if not(arg.startswith("{} ".format(pp))):
-            # Avoid repeating the preporition in cases where both question and answer contain it
-            return " ".join([pp,
-                             arg])
+        if len(split_surface) > 1:
+            # This predicate has a modal preceding the base verb
+            verb = split_surface[-1]
+            ret = split_surface[:-1] # get all of the elements in the modal
+        else:
+            verb = split_surface[0]
+            ret = []
 
-    # Normal cases
-    return arg
+        split_questions = map(lambda question: question.split(' '),
+                            questions)
+
+        preds = map(normalize_element,
+                    map(itemgetter(QUESTION_TRG_INDEX),
+                        split_questions))
+        if len(set(preds)) > 1:
+            # This predicate is appears in multiple ways, let's stick to the base form
+            ret.append(verb)
+
+        if len(set(preds)) == 1:
+            # Change the predciate to the inflected form
+            # if there's exactly one way in which the predicate is conveyed
+            ret.append(preds[0])
+
+            pps = map(normalize_element,
+                      map(itemgetter(QUESTION_PP_INDEX),
+                          split_questions))
+
+            obj2s = map(normalize_element,
+                        map(itemgetter(QUESTION_OBJ2_INDEX),
+                            split_questions))
+
+            if (len(set(pps)) == 1) and (len(set(obj2s)) == 1):
+                # If all questions for the predicate include the same pp attachemnt -
+                # assume it's a multiword predicate
+                self.is_mwp = True # Signal to arguments that they shouldn't take the preposition
+                logging.critical("found an mwp: {}".format(questions))
+                ret.extend([pps[0], obj2s[0]])
+
+        # Concat all elements in the predicate and return
+        return " ".join(ret).strip()
+
+
+    def augment_arg_with_question(self, arg, question):
+        """
+        Decide what elements from the question to incorporate in the given
+        corresponding argument
+        """
+        # Parse question
+        wh, aux, sbj, trg, obj1, pp, obj2 = map(normalize_element,
+                                                question.split(' ')[:-1]) # Last split is the question mark
+
+        # Place preposition in argument
+        # This is safer when dealing with n-ary arguments, as it's directly attaches to the
+        # appropriate argument
+        if (not self.is_mwp) and pp and (not obj2):
+            if not(arg.startswith("{} ".format(pp))):
+                # Avoid repeating the preporition in cases where both question and answer contain it
+                return " ".join([pp,
+                                 arg])
+
+        # Normal cases
+        return arg
 
 def normalize_element(elem):
     """
     Return a surface form of the given question element.
     the output should be properly able to precede a predicate (or blank otherwise)
     """
-    return elem \
+    return elem.replace("_", " ") \
         if (elem != "_")\
            else ""
 
@@ -162,3 +213,6 @@ def escape_special_chars(s):
 
 ## CONSTANTS
 SEP = ';;;'
+QUESTION_TRG_INDEX =  3 # index of the predicate within the question
+QUESTION_PP_INDEX = 5
+QUESTION_OBJ2_INDEX = 6

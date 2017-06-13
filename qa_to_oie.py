@@ -5,18 +5,58 @@
 from docopt import docopt
 import re
 import itertools
-from oie_readers.extraction import Extraction, escape_special_chars
+from oie_readers.extraction import Extraction, escape_special_chars, normalize_element
 from collections  import defaultdict
 import logging
 import operator
 
 ## CONSTANTS
 
-QUESTION_TRG_INDEX =  3 # index of the predicate within the question
-QUESTION_MODALITY_INDEX = 1 # index of the modality within the question
 PASS_ALL = lambda x: x
 MASK_ALL = lambda x: "_"
 get_default_mask = lambda : [PASS_ALL] * 8
+
+# QA-SRL vocabulary for "AUX" placement, which modifies the predicates
+QA_SRL_AUX_MODIFIERS = [
+ #   "are",
+    "are n't",
+    "can",
+    "ca n't",
+    "could",
+    "could n't",
+#    "did",
+    "did n't",
+#    "do",
+#    "does",
+    "does n't",
+    "do n't",
+    "had",
+    "had n't",
+#    "has",
+    "has n't",
+#    "have",
+    "have n't",
+#    "is",
+    "is n't",
+    "may",
+    "may not",
+    "might",
+    "might not",
+    "must",
+    "must n't",
+    "should",
+    "should n't",
+#    "was",
+    "was n't",
+#    "were",
+    "were n't",
+    "will",
+    "wo n't",
+    "would",
+    "would n't",
+]
+
+
 
 class Qa2OIE:
 
@@ -65,9 +105,8 @@ class Qa2OIE:
         Returns output which can in turn serve as input for load_file.
         """
         lc = 0
-        curArgs = []
         sentQAs = []
-        curPred = ""
+        curPred = defaultdict(lambda : [])
         curSent = ""
         ret = ''
 
@@ -89,25 +128,29 @@ class Qa2OIE:
                 lc += 1
                 sentQAs = []
             elif lc == 2:
-                if curArgs:
-                    sentQAs.append((curPred, curArgs))
-                    curArgs = []
+                for (surfacePred, curArgs) in curPred.iteritems():
+                    sentQAs.append((surfacePred, curArgs))
+                curPred = defaultdict(lambda: [])
                 # Update line counter.
                 if line.strip() == "":
                     lc = 0 # new line for new sent
                 else:
                     # reading predicate and qa pairs
-                    curPred, count = info[1:]
+                    basePred, count = info[1:]
                     lc += int(count)
             elif lc > 2:
                 question = encodeQuestion("\t".join(info[:-1]), mask)
+                surfacePred = augment_pred_with_question(basePred, question)
                 answers = self.consolidate_answers(info[-1].split("###"))
-                curArgs.append(zip([question]*len(answers), answers))
+                curPred[surfacePred].append(zip([question]*len(answers), answers))
+
                 lc -= 1
                 if (lc == 2):
                     # Reached the end of this predicate's questions
-                    sentQAs.append((curPred, curArgs))
-                    curArgs = []
+                    for (surfacePred, curArgs) in curPred.iteritems():
+                        sentQAs.append((surfacePred, # Get all questions
+                                        curArgs))
+                    curPred = defaultdict(lambda: [])
         # Flush
         if sentQAs:
             ret += self.printSent(curSent, sentQAs)
@@ -162,7 +205,27 @@ class Qa2OIE:
                     fout.write('{}\t{}\n'.format(escape_special_chars(sent), 
                                                  ex.__str__()))
 
-# MORE HELPER 
+
+
+# MORE HELPER
+def augment_pred_with_question(pred, question):
+    """
+    Decide what elements from the question to incorporate in the given
+    corresponding predicate
+    """
+    # Parse question
+    wh, aux, sbj, trg, obj1, pp, obj2 = map(normalize_element,
+                                            question.split(' ')[:-1]) # Last split is the question mark
+
+    # Add auxiliary to the predicate
+    if aux in QA_SRL_AUX_MODIFIERS:
+        return " ".join([aux, pred])
+    else:
+        logging.critical("{} denied".format(aux))
+
+    # Non modified predicates
+    return pred
+
 
 def is_str_subset(s1, s2):
     """ returns true iff the words in string s1 are contained in string s2 in the same order by which they appear in s2 """
