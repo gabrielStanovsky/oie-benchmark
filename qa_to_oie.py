@@ -132,7 +132,7 @@ class Qa2OIE:
         """
         lc = 0
         sentQAs = []
-        curPred = defaultdict(lambda : [])
+        curAnswers = []
         curSent = ""
         ret = ''
 
@@ -154,29 +154,32 @@ class Qa2OIE:
                 lc += 1
                 sentQAs = []
             elif lc == 2:
-                for (surfacePred, curArgs) in curPred.iteritems():
-                    sentQAs.append(((surfacePred, predIndex), curArgs))
-                curPred = defaultdict(lambda: [])
+                if curAnswers:
+                    sentQAs.append(((surfacePred, predIndex),
+                                    curAnswers))
+                curAnswers = []
                 # Update line counter.
                 if line.strip() == "":
                     lc = 0 # new line for new sent
                 else:
                     # reading predicate and qa pairs
                     predIndex, basePred, count = info
+                    surfacePred = basePred
                     lc += int(count)
             elif lc > 2:
                 question = encodeQuestion("\t".join(info[:-1]), mask)
-                surfacePred = augment_pred_with_question(basePred, question)
+                curSurfacePred = augment_pred_with_question(basePred, question)
+                if len(curSurfacePred) > len(surfacePred):
+                    surfacePred = curSurfacePred
                 answers = self.consolidate_answers(info[-1].split("###"))
-                curPred[surfacePred].append(zip([question]*len(answers), answers))
+                curAnswers.append(zip([question]*len(answers), answers))
 
                 lc -= 1
                 if (lc == 2):
                     # Reached the end of this predicate's questions
-                    for (surfacePred, curArgs) in curPred.iteritems():
-                        sentQAs.append(((surfacePred, predIndex),
-                                        curArgs))
-                    curPred = defaultdict(lambda: [])
+                    sentQAs.append(((surfacePred, predIndex),
+                                    curAnswers))
+                    curAnswers = []
         # Flush
         if sentQAs:
             ret += self.printSent(curSent, sentQAs)
@@ -312,7 +315,7 @@ def longest_common_substring(s1, s2):
 
 ## MAIN
 if __name__ == '__main__':
-    logging.basicConfig(level = logging.DEBUG)
+    logging.basicConfig(level = logging.INFO)
     # Parse arguments and call conversions
     args = docopt(__doc__)
     logging.debug(args)
