@@ -47,6 +47,7 @@ After obtaining the QA-SRL corpus, run:
 ```
 
 If everything runs fine, this should create an Open IE corpus (split between wiki and newswire domain) under [oie_corpus](oie_corpus).
+A snapshot of the corpus is also [available](snapshot_oie_corpus.tar.gz).
 
 ### Expected Folder Structure
 The script currently expects the following folder structure:
