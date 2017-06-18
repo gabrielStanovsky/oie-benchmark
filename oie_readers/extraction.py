@@ -128,12 +128,30 @@ class Extraction:
         return [a for a, _ in sorted(ls,
                                      key = lambda (_, indices): min(indices))]
 
+    def question_prob_for_loc(self, question, loc):
+        """
+        Returns the probability of the given question leading to argument
+        appearing in the given location in the output slot.
+        """
+        gen_question = generalize_question(self.sent,
+                                           question,
+                                           self.pred_index)
+        q_dist = self.question_dist[gen_question]
+        logging.debug("distribution of {}: {}".format(gen_question,
+                                                      q_dist))
+
+        return float(q_dist.get(loc, 0)) /  \
+            sum(q_dist.values())
+
     def sort_args_by_distribution(self):
         """
         Use this instance's question distribution (this func assumes it exists)
         in determining the positioning of the arguments.
         Greedy algorithm:
-        1. Sort arguments by the prevalance of their questions
+        0. Decide on which argument will serve as the ``subject'' (first slot) of this extraction
+        0.1 Based on the most probable one for this spot
+        (special care is given to select the highly-influential subject position)
+        1. For all other arguments, sort arguments by the prevalance of their questions
         2. For each argument:
         2.1 Assign to it the most probable slot still available
         2.2 If non such exist (fallback) - default to put it in the last location
@@ -142,20 +160,30 @@ class Extraction:
 
         # Store arguments by slot
         ret = {INF_LOC: []}
-
         logging.debug("sorting: {}".format(self.questions))
-        for (question, args) in sorted(self.questions.iteritems(),
+
+        # Find the most suitable arguemnt for the subject location
+        logging.debug("probs for subject: {}".format([(q, self.question_prob_for_loc(q, 0))
+                                                      for (q, _) in self.questions.iteritems()]))
+
+        subj_question, subj_args = max(self.questions.iteritems(),
+                                       key = lambda (q, _): self.question_prob_for_loc(q, 0))
+
+        ret[0] = [(subj_args[0], subj_question)]
+
+        # Find the rest
+        for (question, args) in sorted([(q, a)
+                                        for (q, a) in self.questions.iteritems() if (q not in [subj_question])],
                                        key = lambda (q, _): \
                                        sum(self.question_dist[generalize_question(self.sent,
                                                                                   q,
-                                                                                  self.pred_index)].values())):
+                                                                                  self.pred_index)].values()),
+                                       reverse = True):
             gen_question = generalize_question(self.sent,
                                                question,
                                                self.pred_index)
             arg = args[0]
             assigned_flag = False
-            logging.debug("distribution of {}: {}".format(gen_question,
-                                                          self.question_dist[gen_question]))
             for (loc, count) in sorted(self.question_dist[gen_question].iteritems(),
                                        key = lambda (_ , c): c,
                                        reverse = True):
@@ -275,20 +303,11 @@ def escape_special_chars(s):
 def generalize_question(sent, question, pred_index):
     """
     Given a question in the context of the sentence and the predicate index within
-    the question - return a generalized version which replaces the verb with its POS
+    the question - return a generalized version which extracts only order-imposing features
     """
     import nltk   # Using nltk since couldn't get spaCy to agree on the tokenization
-    split_question = question.split(' ')
-    pos_tags = nltk.pos_tag(sent.split(' '))
-    verb_word, verb_pos = pos_tags[pred_index]
-
-    # Replace the verb in the question to its POS, keeping any other items in the
-    # predicate slot
-    pred = split_question[QUESTION_TRG_INDEX].split("_")
-    pred[-1] = verb_pos # verb always ends predicates (for example "be sold")
-    split_question[QUESTION_TRG_INDEX] = "_".join(pred)
-
-    return ' '.join(split_question)
+    wh, aux, sbj, trg, obj1, pp, obj2 = question.split(' ')[:-1] # Last split is the question mark
+    return ' '.join([wh, sbj, obj1])
 
 
 

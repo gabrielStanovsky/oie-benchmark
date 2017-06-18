@@ -76,8 +76,15 @@ class Qa2OIE:
         If a distribtion file is given, it is used to determine the hopefully correct
         order of arguments. Otherwise, these are oredered accroding to their linearization
         """
-        self.question_dist = json.load(open(dist_file)) if dist_file \
-                             else {}
+        # This next lines ensures that the json is loaded with numerical
+        # indexes for loc
+        self.question_dist = dict([(q, dict([(int(loc), cnt)
+                                             for (loc, cnt)
+                                             in dist.iteritems()]))
+                                   for (q, dist)
+                                   in json.load(open(dist_file)).iteritems()]) \
+                                       if dist_file\
+                                          else {}
 
         self.dic = self.loadFile(self.getExtractions(qaFile))
 
