@@ -1,5 +1,5 @@
 """ Usage:
-    qa_to_oie --in=INPUT_FILE --out=OUTPUT_FILE [--oieinput=OIE_INPUT]
+    qa_to_oie --in=INPUT_FILE --out=OUTPUT_FILE [--dist=DIST_FILE] [--oieinput=OIE_INPUT] 
 """
 
 from docopt import docopt
@@ -9,6 +9,14 @@ from oie_readers.extraction import Extraction, escape_special_chars, normalize_e
 from collections  import defaultdict
 import logging
 import operator
+import nltk
+import json
+
+from oie_readers.extraction import QUESTION_TRG_INDEX
+from oie_readers.extraction import QUESTION_PP_INDEX
+from oie_readers.extraction import QUESTION_OBJ2_INDEX
+
+
 
 ## CONSTANTS
 
@@ -59,12 +67,18 @@ QA_SRL_AUX_MODIFIERS = [
 
 
 class Qa2OIE:
-
     # Static variables
     extractions_counter = 0
 
-    def __init__(self, qaFile):
-        ''' loads qa file and converts it into  open IE '''
+    def __init__(self, qaFile, dist_file = ""):
+        """
+        Loads qa file and converts it into  open IE
+        If a distribtion file is given, it is used to determine the hopefully correct
+        order of arguments. Otherwise, these are oredered accroding to their linearization
+        """
+        self.question_dist = json.load(open(dist_file)) if dist_file \
+                             else {}
+
         self.dic = self.loadFile(self.getExtractions(qaFile))
 
     def loadFile(self, lines):
@@ -88,8 +102,13 @@ class Qa2OIE:
 
             else:
                 pred = data[0]
-                cur = Extraction((pred, all_index(sent, pred, matchCase = False)), sent, confidence = 1.0)
-                for q, a in zip(data[1::2], data[2::2]):
+                pred_index = data[1]
+                cur = Extraction((pred, all_index(sent, pred, matchCase = False)),
+                                 pred_index,
+                                 sent,
+                                 confidence = 1.0,
+                                 question_dist = self.question_dist)
+                for q, a in zip(data[2::2], data[3::2]):
                     indices = all_index(sent, a, matchCase = False)
                     cur.addArg((a, indices), q)
                     indsForQuestions[q] = indsForQuestions[q].union(indices)
@@ -129,14 +148,14 @@ class Qa2OIE:
                 sentQAs = []
             elif lc == 2:
                 for (surfacePred, curArgs) in curPred.iteritems():
-                    sentQAs.append((surfacePred, curArgs))
+                    sentQAs.append(((surfacePred, predIndex), curArgs))
                 curPred = defaultdict(lambda: [])
                 # Update line counter.
                 if line.strip() == "":
                     lc = 0 # new line for new sent
                 else:
                     # reading predicate and qa pairs
-                    basePred, count = info[1:]
+                    predIndex, basePred, count = info
                     lc += int(count)
             elif lc > 2:
                 question = encodeQuestion("\t".join(info[:-1]), mask)
@@ -148,7 +167,7 @@ class Qa2OIE:
                 if (lc == 2):
                     # Reached the end of this predicate's questions
                     for (surfacePred, curArgs) in curPred.iteritems():
-                        sentQAs.append((surfacePred, # Get all questions
+                        sentQAs.append(((surfacePred, predIndex),
                                         curArgs))
                     curPred = defaultdict(lambda: [])
         # Flush
@@ -159,10 +178,10 @@ class Qa2OIE:
 
     def printSent(self, sent, sentQAs):
         ret =  sent + "\n"
-        for pred, predQAs in sentQAs:
+        for (pred, pred_index), predQAs in sentQAs:
             for element in itertools.product(*predQAs):
                 self.encodeExtraction(element)
-                ret += "\t".join([pred] + ["\t".join(x) for x in element]) + "\n"
+                ret += "\t".join([pred, pred_index] + ["\t".join(x) for x in element]) + "\n"
         ret += "\n"
         return ret
 
@@ -204,8 +223,6 @@ class Qa2OIE:
                 for ex in extractions:
                     fout.write('{}\t{}\n'.format(escape_special_chars(sent), 
                                                  ex.__str__()))
-
-
 
 # MORE HELPER
 def augment_pred_with_question(pred, question):
@@ -254,8 +271,6 @@ def encodeQuestion(question, mask):
     ret = " ".join(info)
     return ret
 
-
-
 def all_index(s, ss, matchCase = True, ignoreSpaces = True):
     ''' find all occurrences of substring ss in s '''
     if not matchCase:
@@ -286,15 +301,21 @@ def longest_common_substring(s1, s2):
 
     return s1[start:end]
 
+
+
 ## MAIN
 if __name__ == '__main__':
-    logging.basicConfig(level = logging.CRITICAL)
+    logging.basicConfig(level = logging.DEBUG)
     # Parse arguments and call conversions
     args = docopt(__doc__)
     logging.debug(args)
-    q = Qa2OIE(args['--in'])
+    inp = args['--in']
+    out = args['--out']
+    dist_file = args['--dist'] if args['--dist']\
+           else ''
+    q = Qa2OIE(args['--in'], dist_file = dist_file)
     q.writeOIE(args['--out'])
-    if args['--oieinput']:
-        q.createOIEInput(args['--oieinput'])
+    # if args['--oieinput']:
+    #     q.createOIEInput(args['--oieinput'])
 
 

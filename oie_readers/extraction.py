@@ -3,12 +3,13 @@ from oie_readers.argument import Argument
 from operator import itemgetter
 from collections import defaultdict
 import nltk
-import logging 
+import logging
 
 class Extraction:
     ''' holds sentence, single predicate and corresponding arguments '''
-    def __init__(self, pred, sent, confidence):
+    def __init__(self, pred, pred_index, sent, confidence, question_dist):
         self.pred = pred
+        self.pred_index = int(pred_index)
         self.sent = sent
         self.args = []
         self.confidence = confidence
@@ -16,6 +17,7 @@ class Extraction:
         self.questions = {}
         self.indsForQuestions = defaultdict(lambda: set())
         self.is_mwp = False
+        self.question_dist = question_dist
 
     def distArgFromPred(self, arg):
         assert(len(self.pred) == 2)
@@ -104,6 +106,14 @@ class Extraction:
         return ' '.join([self.elementToStr(elem) for elem in [self.pred] + self.args])
 
     def getSortedArgs(self):
+        """
+        Sort the list of arguments.
+        If a question distribution is provided - use it,
+        otherwise, default to the order of appearance in the sentence.
+        """
+        if self.question_dist:
+            # There's a question distribtuion - use it
+            return self.sort_args_by_distribution()
         ls = []
         for q, args in self.questions.iteritems():
             if (len(args) != 1):
@@ -115,7 +125,60 @@ class Extraction:
                 logging.debug("Empty indexes for arg {} -- backing to zero".format(arg))
                 indices = [0]
             ls.append(((arg, q), indices))
-        return [a for a, _ in sorted(ls, key = lambda (_, indices): min(indices))]
+        return [a for a, _ in sorted(ls,
+                                     key = lambda (_, indices): min(indices))]
+
+    def sort_args_by_distribution(self):
+        """
+        Use this instance's question distribution (this func assumes it exists)
+        in determining the positioning of the arguments.
+        Greedy algorithm:
+        1. Sort arguments by the prevalance of their questions
+        2. For each argument:
+        2.1 Assign to it the most probable slot still available
+        2.2 If non such exist (fallback) - default to put it in the last location
+        """
+        INF_LOC = 100 # Used as an impractical last argument
+
+        # Store arguments by slot
+        ret = {INF_LOC: []}
+
+        logging.debug("sorting: {}".format(self.questions))
+        for (question, args) in sorted(self.questions.iteritems(),
+                                       key = lambda (q, _): \
+                                       sum(self.question_dist[generalize_question(self.sent,
+                                                                                  q,
+                                                                                  self.pred_index)].values())):
+            gen_question = generalize_question(self.sent,
+                                               question,
+                                               self.pred_index)
+            arg = args[0]
+            assigned_flag = False
+            logging.debug("distribution of {}: {}".format(gen_question,
+                                                          self.question_dist[gen_question]))
+            for (loc, count) in sorted(self.question_dist[gen_question].iteritems(),
+                                       key = lambda (_ , c): c,
+                                       reverse = True):
+                if loc not in ret:
+                    # Found an empty slot for this item
+                    # Place it there and break out
+                    ret[loc] = [(arg, question)]
+                    assigned_flag = True
+                    break
+
+            if not assigned_flag:
+                # Add this argument to the non-assigned (hopefully doesn't happen much)
+                logging.debug("Couldn't find an open assignment for {}".format((arg, gen_question)))
+                ret[INF_LOC].append((arg, question))
+
+        logging.debug("Linearizing arg list: {}".format(ret))
+
+        # Finished iterating - consolidate and return a list of arguments
+        return [arg
+                for (_, arg_ls) in sorted(ret.iteritems(),
+                                          key = lambda (k, v): int(k))
+                for arg in arg_ls]
+
 
     def __str__(self):
         return '{0}\t{1}'.format(self.compute_global_pred(self.elementToStr(self.pred),
@@ -207,6 +270,25 @@ def normalize_element(elem):
 ## Helper functions
 def escape_special_chars(s):
     return s.replace('\t', '\\t')
+
+
+def generalize_question(sent, question, pred_index):
+    """
+    Given a question in the context of the sentence and the predicate index within
+    the question - return a generalized version which replaces the verb with its POS
+    """
+    import nltk   # Using nltk since couldn't get spaCy to agree on the tokenization
+    split_question = question.split(' ')
+    pos_tags = nltk.pos_tag(sent.split(' '))
+    verb_word, verb_pos = pos_tags[pred_index]
+
+    # Replace the verb in the question to its POS, keeping any other items in the
+    # predicate slot
+    pred = split_question[QUESTION_TRG_INDEX].split("_")
+    pred[-1] = verb_pos # verb always ends predicates (for example "be sold")
+    split_question[QUESTION_TRG_INDEX] = "_".join(pred)
+
+    return ' '.join(split_question)
 
 
 
