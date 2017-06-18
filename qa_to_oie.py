@@ -111,7 +111,6 @@ class Qa2OIE:
                 pred = data[0]
                 pred_index = data[1]
                 cur = Extraction((pred, all_index(sent, pred, matchCase = False)),
-                                 pred_index,
                                  sent,
                                  confidence = 1.0,
                                  question_dist = self.question_dist)
@@ -325,7 +324,7 @@ if __name__ == '__main__':
            else ''
     q = Qa2OIE(args['--in'], dist_file = dist_file)
     q.writeOIE(args['--out'])
-    # if args['--oieinput']:
-    #     q.createOIEInput(args['--oieinput'])
+    if args['--oieinput']:
+        q.createOIEInput(args['--oieinput'])
 
 

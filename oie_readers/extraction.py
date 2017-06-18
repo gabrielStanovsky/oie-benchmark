@@ -7,9 +7,8 @@ import logging
 
 class Extraction:
     ''' holds sentence, single predicate and corresponding arguments '''
-    def __init__(self, pred, pred_index, sent, confidence, question_dist):
+    def __init__(self, pred, sent, confidence, question_dist = ''):
         self.pred = pred
-        self.pred_index = int(pred_index)
         self.sent = sent
         self.args = []
         self.confidence = confidence
@@ -133,9 +132,7 @@ class Extraction:
         Returns the probability of the given question leading to argument
         appearing in the given location in the output slot.
         """
-        gen_question = generalize_question(self.sent,
-                                           question,
-                                           self.pred_index)
+        gen_question = generalize_question(question)
         q_dist = self.question_dist[gen_question]
         logging.debug("distribution of {}: {}".format(gen_question,
                                                       q_dist))
@@ -175,13 +172,9 @@ class Extraction:
         for (question, args) in sorted([(q, a)
                                         for (q, a) in self.questions.iteritems() if (q not in [subj_question])],
                                        key = lambda (q, _): \
-                                       sum(self.question_dist[generalize_question(self.sent,
-                                                                                  q,
-                                                                                  self.pred_index)].values()),
+                                       sum(self.question_dist[generalize_question(q)].values()),
                                        reverse = True):
-            gen_question = generalize_question(self.sent,
-                                               question,
-                                               self.pred_index)
+            gen_question = generalize_question(question)
             arg = args[0]
             assigned_flag = False
             for (loc, count) in sorted(self.question_dist[gen_question].iteritems(),
@@ -300,7 +293,7 @@ def escape_special_chars(s):
     return s.replace('\t', '\\t')
 
 
-def generalize_question(sent, question, pred_index):
+def generalize_question(question):
     """
     Given a question in the context of the sentence and the predicate index within
     the question - return a generalized version which extracts only order-imposing features
