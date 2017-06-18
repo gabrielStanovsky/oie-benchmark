@@ -34,9 +34,7 @@ class Analyzer:
         """
         for ex in extractions:
             # Count the observed location for each generalized question
-            for ind, gen_question in enumerate([generalize_question(ex.sent,
-                                                                    question,
-                                                                    ex.pred_index)
+            for ind, gen_question in enumerate([generalize_question(question)
                                                 for (_, question) in ex.getSortedArgs()]):
                 self.question_dist[gen_question][ind] += 1
 
