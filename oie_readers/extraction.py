@@ -202,11 +202,22 @@ class Extraction:
 
 
     def __str__(self):
-        return '{0}\t{1}'.format(self.compute_global_pred(self.elementToStr(self.pred),
-                                                          self.questions.keys()),
-                                 '\t'.join([escape_special_chars(self.augment_arg_with_question(self.elementToStr(arg),
-                                                                                                question))
-                                            for arg, question in self.getSortedArgs()]))
+        pred_str = self.elementToStr(self.pred)
+        return '{}\t{}\t{}'.format(self.get_base_verb(pred_str),
+                                   self.compute_global_pred(pred_str,
+                                                            self.questions.keys()),
+                                   '\t'.join([escape_special_chars(self.augment_arg_with_question(self.elementToStr(arg),
+                                                                                                  question))
+                                              for arg, question in self.getSortedArgs()]))
+
+    def get_base_verb(self, surface_pred):
+        """
+        Given the surface pred, return the original annotated verb
+        """
+        # Assumes that at this point the verb is always the last word
+        # in the surface predicate
+        return surface_pred.split(' ')[-1]
+
 
     def compute_global_pred(self, surface_pred, questions):
         """

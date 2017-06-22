@@ -15,8 +15,8 @@ class GoldReader(OieReader):
         with open(fn) as fin:
             for line in fin:
                 data = line.strip().split('\t')
-                text, rel = data[:2]
-                args = data[2:]
+                text, base_rel, rel = data[:3]
+                args = data[3:]
                 confidence = 1
                 
                 curExtraction = Extraction(pred = rel, sent = text, confidence = float(confidence))
