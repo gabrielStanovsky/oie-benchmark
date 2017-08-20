@@ -120,7 +120,7 @@ class Qa2OIE:
                     indsForQuestions[q] = indsForQuestions[q].union(indices)
 
                 if sent:
-#                    if cur.noPronounArgs():
+                    if cur.noPronounArgs():
                         d[sent].append(cur)
         return d
 
