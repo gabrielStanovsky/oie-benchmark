@@ -6,6 +6,9 @@
   - [Citing](#citing)
   - [Contact](#contact)
 - [Requirements](#requirements)
+- [Changelog](#changelog)
+  - [Filtering Pronoun Arguments](#filtering-pronoun-arguments)
+  - [Changing the Matching Function](#changing-the-matching-function)
 - [Converting QA-SRL to Open IE](#converting-qa-srl-to-open-ie)
   - [Expected Folder Structure](#expected-folder-structure)
 - [Evaluating an Open IE Extractor](#evaluating-an-open-ie-extractor)
@@ -16,7 +19,7 @@
 
 ## Introduction
 
-Code for converting QA-SRL annotations to Open-IE extractions and comparing Open-IE parsers against a converted benchmark corpus.
+This repository contains code for converting QA-SRL annotations to Open-IE extractions and comparing Open-IE parsers against a converted benchmark corpus.
 This is an implementation of the algorithms described in our [EMNLP2016 paper](https://gabrielstanovsky.github.io/assets/papers/emnlp16a/paper.pdf).
 
 ### Citing
@@ -43,6 +46,24 @@ Python 2.7, tested on Ubuntu.
 See required python packages [here](requirements.txt).
 
 Additional help can be found in the [FAQ section](faq.md).
+
+## Changelog
+Since the publication of this resource, we made several changes, outlined below.
+The original version of the corpus, with 10359 extractions, as reported in the paper, is available [here](https://github.com/gabrielStanovsky/oie-benchmark/blob/master/snapshot_oie_corpus_with_pronouns.tar.gz).
+
+### Filtering Pronoun Arguments
+We removed extractions that had only pronouns as one of the arguments, and that the same extraction appeared using the entity the pronoun was referring to.<br>
+Consider, For example:
+```John went home, he was hungry```
+The original corpus would have had both extractions:
+   1. ("John", "was", "hungry")
+   2. ("he", "was", "hungry")
+
+      In the current version of the corpus, extraction (2) is omitted, following the observation that we penalize some systems for not extracting it, where they may be doing so as a design choice.
+
+### Changing the Matching Function
+Somewhat similar to the first point, we changed the evaluation scripts slightly to be more lenient.
+Overall, while this changes the absolute performance numbers of the different systems, it does not change the relative performance of any of the tested systems.
 
 ## Converting QA-SRL to Open IE
 To run the code, you should first obtain the **full** [QA-SRL corpus](https://dada.cs.washington.edu/qasrl/#dataset) and place it under [QASRL-full](QASRL-full).
