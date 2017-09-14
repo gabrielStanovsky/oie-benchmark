@@ -49,7 +49,7 @@ Additional help can be found in the [FAQ section](faq.md).
 
 ## Changelog
 Since the publication of this resource, we made several changes, outlined below.
-The original version of the corpus, with 10359 extractions, as reported in the paper, is available [here](https://github.com/gabrielStanovsky/oie-benchmark/blob/master/snapshot_oie_corpus_with_pronouns.tar.gz).
+The original version of the corpus, with 10,359 extractions, as reported in the paper, is available [here](https://github.com/gabrielStanovsky/oie-benchmark/blob/master/snapshot_oie_corpus_with_pronouns.tar.gz).
 
 ### Filtering Pronoun Arguments
 We removed extractions that had only pronouns as one of the arguments, and that the same extraction appeared using the entity the pronoun was referring to.<br>
