@@ -42,7 +42,8 @@ Leave us a note at
 ```gabriel (dot) satanovsky (at) gmail (dot) com```
 
 ## Requirements
-Python 3
+Python 3.
+
 See required python packages [here](requirements.txt).
 
 Additional help can be found in the [FAQ section](faq.md).
