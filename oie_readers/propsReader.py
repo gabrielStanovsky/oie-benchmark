@@ -35,7 +35,7 @@ class PropSReader(OieReader):
         
         denom = maxConfidence - minConfidence + (2*EPSILON)
         
-        for sent, extractions in self.oie.items():
+        for sent, extractions in list(self.oie.items()):
             for extraction in extractions:
                 extraction.confidence = ( (extraction.confidence - minConfidence) + EPSILON) / denom
 

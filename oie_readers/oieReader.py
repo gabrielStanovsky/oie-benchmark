@@ -7,4 +7,4 @@ class OieReader:
     
     def count(self):
         ''' number of extractions '''
-        return sum([len(extractions) for _, extractions in self.oie.items()])
+        return sum([len(extractions) for _, extractions in list(self.oie.items())])
