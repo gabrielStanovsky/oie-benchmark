@@ -1,6 +1,11 @@
 import string
+import nltk
 from nltk.translate.bleu_score import sentence_bleu
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+nltk.download('wordnet', quiet=True)
+lemmatizer = WordNetLemmatizer() 
 
 class Matcher:
     @staticmethod
@@ -32,7 +37,14 @@ class Matcher:
         sRef = ref.bow().split(' ')
         sEx = ex.bow().split(' ')
         count = 0
-        
+        gold_predicate_words = [lemmatizer.lemmatize(w) for w in ref.elementToStr(ref.pred.strip()).split(' ')]
+        ex_predicate_words = [lemmatizer.lemmatize(w) for w in ex.elementToStr(ex.pred.strip()).split(' ')]
+
+        # Make sure the predicates, at the very least, match before 
+        # seeing if the doing the lexical match
+        if not bool(set(ex_predicate_words) & set(gold_predicate_words)):
+            return False
+
         for w1 in sRef:
             for w2 in sEx:
                 if w1 == w2:
@@ -52,7 +64,7 @@ class Matcher:
     
     # CONSTANTS
     BLEU_THRESHOLD = 0.4
-    LEXICAL_THRESHOLD = 0.5 # Note: changing this value didn't change the ordering of the tested systems
+    LEXICAL_THRESHOLD = 0.25 # Note: changing this value didn't change the ordering of the tested systems
     stopwords = stopwords.words('english') + list(string.punctuation)
 
 

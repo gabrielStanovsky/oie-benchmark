@@ -53,9 +53,8 @@ class Benchmark:
         for sent, goldExtractions in gold.items():
             if sent not in predicted:
                 # The extractor didn't find any extractions for this sentence
-                for goldEx in goldExtractions:   
-                    unmatchedCount += len(goldExtractions)
-                    correctTotal += len(goldExtractions)
+                unmatchedCount += len(goldExtractions)
+                correctTotal += len(goldExtractions)
                 continue
                 
             predictedExtractions = predicted[sent]
@@ -65,11 +64,6 @@ class Benchmark:
                 found = False
                 
                 for predictedEx in predictedExtractions:
-                    if output_fn in predictedEx.matched:
-                        # This predicted extraction was already matched against a gold extraction
-                        # Don't allow to match it again
-                        continue
-                    
                     if matchingFunc(goldEx, 
                                     predictedEx, 
                                     ignoreStopwords = True, 
