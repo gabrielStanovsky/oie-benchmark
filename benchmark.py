@@ -100,7 +100,7 @@ class Benchmark:
         # write PR to file
         with open(output_fn, 'w') as fout:
             fout.write('{0}\t{1}\n'.format("Precision", "Recall"))
-            for cur_p, cur_r in sorted(zip(p, r), key = lambda (cur_p, cur_r): cur_r):
+            for cur_p, cur_r in sorted(zip(p, r), key = lambda cur: cur[1]):
                 fout.write('{0}\t{1}\n'.format(cur_p, cur_r))
     
     @staticmethod
@@ -117,7 +117,7 @@ class Benchmark:
     
     @staticmethod
     def normalizeKey(k):
-        return Benchmark.removePunct(unicode(Benchmark.PTB_unescape(k.replace(' ','')), errors = 'ignore'))
+        return Benchmark.removePunct(Benchmark.PTB_unescape(k.replace(' ','')))
 
     @staticmethod
     def PTB_escape(s):

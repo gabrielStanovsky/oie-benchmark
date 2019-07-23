@@ -91,7 +91,7 @@ class Extraction:
     def binarizeByIndex(self):
         extraction = [self.pred] + self.args
         markPred = [(w, ind, i == 0) for i, (w, ind) in enumerate(extraction)]
-        sortedExtraction = sorted(markPred, key = lambda (ws, indices, f) : indices[0])
+        sortedExtraction = sorted(markPred, key = lambda ws, indices, f : indices[0])
         s =  ' '.join(['{1} {0} {1}'.format(self.elementToStr(elem), SEP) if elem[2] else self.elementToStr(elem) for elem in sortedExtraction])
         binArgs = [a for a in s.split(SEP) if a.rstrip().lstrip()]
         
@@ -125,7 +125,7 @@ class Extraction:
                 indices = [0]
             ls.append(((arg, q), indices))
         return [a for a, _ in sorted(ls,
-                                     key = lambda (_, indices): min(indices))]
+                                     key = lambda _, indices: min(indices))]
 
     def question_prob_for_loc(self, question, loc):
         """
@@ -164,21 +164,21 @@ class Extraction:
                                                       for (q, _) in self.questions.iteritems()]))
 
         subj_question, subj_args = max(self.questions.iteritems(),
-                                       key = lambda (q, _): self.question_prob_for_loc(q, 0))
+                                       key = lambda q, _: self.question_prob_for_loc(q, 0))
 
         ret[0] = [(subj_args[0], subj_question)]
 
         # Find the rest
         for (question, args) in sorted([(q, a)
                                         for (q, a) in self.questions.iteritems() if (q not in [subj_question])],
-                                       key = lambda (q, _): \
+                                       key = lambda q, _: \
                                        sum(self.question_dist[generalize_question(q)].values()),
                                        reverse = True):
             gen_question = generalize_question(question)
             arg = args[0]
             assigned_flag = False
             for (loc, count) in sorted(self.question_dist[gen_question].iteritems(),
-                                       key = lambda (_ , c): c,
+                                       key = lambda _ , c: c,
                                        reverse = True):
                 if loc not in ret:
                     # Found an empty slot for this item
@@ -197,7 +197,7 @@ class Extraction:
         # Finished iterating - consolidate and return a list of arguments
         return [arg
                 for (_, arg_ls) in sorted(ret.iteritems(),
-                                          key = lambda (k, v): int(k))
+                                          key = lambda k, v: int(k))
                 for arg in arg_ls]
 
 
