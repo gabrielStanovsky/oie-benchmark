@@ -78,9 +78,10 @@ class Benchmark:
                         # This is to support packages that do conjunction
                         # splitting, and doesn't affect the results for
                         # packages that don't.
-                        for otherPredictedEx in predictedExtractions:
-                            if otherPredictedEx.pred == predictedEx.pred:
-                                otherPredictedEx.matched.append(output_fn)
+                        if predictedEx.splits_conjunctions:
+                            for otherPredictedEx in predictedExtractions:
+                                if otherPredictedEx.pred == predictedEx.pred:
+                                    otherPredictedEx.matched.append(output_fn)
 
                         found = True
                         break
