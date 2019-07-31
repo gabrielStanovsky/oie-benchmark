@@ -50,7 +50,7 @@ class Benchmark:
         predicted = Benchmark.normalizeDict(predicted)
         gold = Benchmark.normalizeDict(self.gold)
                 
-        for sent, goldExtractions in gold.items():
+        for sent, goldExtractions in list(gold.items()):
             if sent not in predicted:
                 # The extractor didn't find any extractions for this sentence
                 unmatchedCount += len(goldExtractions)
@@ -94,7 +94,7 @@ class Benchmark:
         # write PR to file
         with open(output_fn, 'w') as fout:
             fout.write('{0}\t{1}\n'.format("Precision", "Recall"))
-            for cur_p, cur_r in sorted(zip(p, r), key = lambda cur: cur[1]):
+            for cur_p, cur_r in sorted(zip(p, r), key = lambda cur_p_cur_r: cur_p_cur_r[1]):
                 fout.write('{0}\t{1}\n'.format(cur_p, cur_r))
     
     @staticmethod
@@ -107,11 +107,11 @@ class Benchmark:
     # Helper functions:
     @staticmethod
     def normalizeDict(d):
-        return dict([(Benchmark.normalizeKey(k), v) for k, v in d.items()])
+        return dict([(Benchmark.normalizeKey(k), v) for k, v in list(d.items())])
     
     @staticmethod
     def normalizeKey(k):
-        return Benchmark.removePunct(Benchmark.PTB_unescape(k.replace(' ','')))
+        return Benchmark.removePunct(str(Benchmark.PTB_unescape(k.replace(' ',''))))
 
     @staticmethod
     def PTB_escape(s):
