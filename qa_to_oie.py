@@ -80,9 +80,9 @@ class Qa2OIE:
         # indexes for loc
         self.question_dist = dict([(q, dict([(int(loc), cnt)
                                              for (loc, cnt)
-                                             in dist.iteritems()]))
+                                             in dist.items()]))
                                    for (q, dist)
-                                   in json.load(open(dist_file)).iteritems()]) \
+                                   in json.load(open(dist_file)).items()]) \
                                        if dist_file\
                                           else {}
 
@@ -171,7 +171,7 @@ class Qa2OIE:
                 if len(curSurfacePred) > len(surfacePred):
                     surfacePred = curSurfacePred
                 answers = self.consolidate_answers(info[-1].split("###"))
-                curAnswers.append(zip([question]*len(answers), answers))
+                curAnswers.append(list(zip([question]*len(answers), answers)))
 
                 lc -= 1
                 if (lc == 2):
@@ -195,7 +195,7 @@ class Qa2OIE:
         return ret
 
     def encodeExtraction(self, element):
-        questions = map(operator.itemgetter(0),element)
+        questions = list(map(operator.itemgetter(0),element))
         extractionSet = set(questions)
         encoding = repr(extractionSet)
         (count, _, extractions) = extractionsDic.get(encoding, (0, extractionSet, []))
@@ -228,7 +228,7 @@ class Qa2OIE:
 
     def writeOIE(self, fn):
         with open(fn, 'w') as fout:
-            for sent, extractions in self.dic.iteritems():
+            for sent, extractions in self.dic.items():
                 for ex in extractions:
                     fout.write('{}\t{}\n'.format(escape_special_chars(sent), 
                                                  ex.__str__()))
@@ -240,8 +240,8 @@ def augment_pred_with_question(pred, question):
     corresponding predicate
     """
     # Parse question
-    wh, aux, sbj, trg, obj1, pp, obj2 = map(normalize_element,
-                                            question.split(' ')[:-1]) # Last split is the question mark
+    wh, aux, sbj, trg, obj1, pp, obj2 = list(map(normalize_element,
+                                            question.split(' ')[:-1])) # Last split is the question mark
 
     # Add auxiliary to the predicate
     if aux in QA_SRL_AUX_MODIFIERS:
@@ -293,10 +293,10 @@ def all_index(s, ss, matchCase = True, ignoreSpaces = True):
     return [m.start() for m in re.finditer(re.escape(ss), s)]
 
 def longest_common_substring(s1, s2):
-    m = [[0] * (1 + len(s2)) for i in xrange(1 + len(s1))]
+    m = [[0] * (1 + len(s2)) for i in range(1 + len(s1))]
     longest, x_longest = 0, 0
-    for x in xrange(1, 1 + len(s1)):
-        for y in xrange(1, 1 + len(s2)):
+    for x in range(1, 1 + len(s1)):
+        for y in range(1, 1 + len(s2)):
             if s1[x - 1] == s2[y - 1]:
                 m[x][y] = m[x - 1][y - 1] + 1
                 if m[x][y] > longest:

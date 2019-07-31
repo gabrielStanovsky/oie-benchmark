@@ -43,14 +43,14 @@ class Analyzer:
         Get simple dict representation of the distribtion
         """
         return dict([(k, v)
-                     for k, v in self.question_dist.iteritems()])
+                     for k, v in self.question_dist.items()])
 
     def get_sorted_dist(self):
         """
         Get the question distribution sorted by occurences
         """
-        return sorted(self.get_dist().iteritems(),
-                      key = lambda (q, dist): sum(dist.values()),
+        return sorted(iter(self.get_dist().items()),
+                      key = lambda q_dist: sum(q_dist[1].values()),
                       reverse = True)
 
     def output_dist_to_file(self, json_fn):
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     logging.info("Reading QA-SRL from: {}".format(fin))
     q = Qa2OIE(fin)
     extractions = [ex
-                   for cur_extractions in q.dic.values()
+                   for cur_extractions in list(q.dic.values())
                    for ex in cur_extractions]
 
     # Analyze frequency

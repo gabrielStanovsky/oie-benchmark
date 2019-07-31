@@ -31,6 +31,6 @@ if __name__ == '__main__' :
     g = GoldReader()
     g.read('../oie_corpus/all.oie', includeNominal = False)
     d = g.oie
-    e = d.items()[0]
+    e = list(d.items())[0]
     print(e[1][0].bow())
-    print(g.count())
+    print((g.count()))

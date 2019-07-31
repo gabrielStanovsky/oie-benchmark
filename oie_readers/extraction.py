@@ -92,7 +92,7 @@ class Extraction:
     def binarizeByIndex(self):
         extraction = [self.pred] + self.args
         markPred = [(w, ind, i == 0) for i, (w, ind) in enumerate(extraction)]
-        sortedExtraction = sorted(markPred, key = lambda ws, indices, f : indices[0])
+        sortedExtraction = sorted(markPred, key = lambda ws_indices_f : ws_indices_f[1][0])
         s =  ' '.join(['{1} {0} {1}'.format(self.elementToStr(elem), SEP) if elem[2] else self.elementToStr(elem) for elem in sortedExtraction])
         binArgs = [a for a in s.split(SEP) if a.rstrip().lstrip()]
         
@@ -115,7 +115,7 @@ class Extraction:
             # There's a question distribtuion - use it
             return self.sort_args_by_distribution()
         ls = []
-        for q, args in self.questions.iteritems():
+        for q, args in self.questions.items():
             if (len(args) != 1):
                 logging.debug("Not one argument: {}".format(args))
                 continue
@@ -126,7 +126,7 @@ class Extraction:
                 indices = [0]
             ls.append(((arg, q), indices))
         return [a for a, _ in sorted(ls,
-                                     key = lambda _, indices: min(indices))]
+                                     key = lambda __indices: min(__indices[1]))]
 
     def question_prob_for_loc(self, question, loc):
         """
@@ -162,24 +162,24 @@ class Extraction:
 
         # Find the most suitable arguemnt for the subject location
         logging.debug("probs for subject: {}".format([(q, self.question_prob_for_loc(q, 0))
-                                                      for (q, _) in self.questions.iteritems()]))
+                                                      for (q, _) in self.questions.items()]))
 
-        subj_question, subj_args = max(self.questions.iteritems(),
-                                       key = lambda q, _: self.question_prob_for_loc(q, 0))
+        subj_question, subj_args = max(iter(self.questions.items()),
+                                       key = lambda q__: self.question_prob_for_loc(q__[0], 0))
 
         ret[0] = [(subj_args[0], subj_question)]
 
         # Find the rest
         for (question, args) in sorted([(q, a)
-                                        for (q, a) in self.questions.iteritems() if (q not in [subj_question])],
-                                       key = lambda q, _: \
-                                       sum(self.question_dist[generalize_question(q)].values()),
+                                        for (q, a) in self.questions.items() if (q not in [subj_question])],
+                                       key = lambda q__1: \
+                                       sum(self.question_dist[generalize_question(q__1[0])].values()),
                                        reverse = True):
             gen_question = generalize_question(question)
             arg = args[0]
             assigned_flag = False
-            for (loc, count) in sorted(self.question_dist[gen_question].iteritems(),
-                                       key = lambda _ , c: c,
+            for (loc, count) in sorted(iter(self.question_dist[gen_question].items()),
+                                       key = lambda __c: __c[1],
                                        reverse = True):
                 if loc not in ret:
                     # Found an empty slot for this item
@@ -197,8 +197,8 @@ class Extraction:
 
         # Finished iterating - consolidate and return a list of arguments
         return [arg
-                for (_, arg_ls) in sorted(ret.iteritems(),
-                                          key = lambda k, v: int(k))
+                for (_, arg_ls) in sorted(iter(ret.items()),
+                                          key = lambda k_v: int(k_v[0]))
                 for arg in arg_ls]
 
 
@@ -206,7 +206,7 @@ class Extraction:
         pred_str = self.elementToStr(self.pred)
         return '{}\t{}\t{}'.format(self.get_base_verb(pred_str),
                                    self.compute_global_pred(pred_str,
-                                                            self.questions.keys()),
+                                                            list(self.questions.keys())),
                                    '\t'.join([escape_special_chars(self.augment_arg_with_question(self.elementToStr(arg),
                                                                                                   question))
                                               for arg, question in self.getSortedArgs()]))
@@ -237,12 +237,11 @@ class Extraction:
             verb = split_surface[0]
             ret = []
 
-        split_questions = map(lambda question: question.split(' '),
-                            questions)
+        split_questions = [question.split(' ') for question in questions]
 
-        preds = map(normalize_element,
-                    map(itemgetter(QUESTION_TRG_INDEX),
-                        split_questions))
+        preds = list(map(normalize_element,
+                    list(map(itemgetter(QUESTION_TRG_INDEX),
+                        split_questions))))
         if len(set(preds)) > 1:
             # This predicate is appears in multiple ways, let's stick to the base form
             ret.append(verb)
@@ -252,13 +251,13 @@ class Extraction:
             # if there's exactly one way in which the predicate is conveyed
             ret.append(preds[0])
 
-            pps = map(normalize_element,
-                      map(itemgetter(QUESTION_PP_INDEX),
-                          split_questions))
+            pps = list(map(normalize_element,
+                      list(map(itemgetter(QUESTION_PP_INDEX),
+                          split_questions))))
 
-            obj2s = map(normalize_element,
-                        map(itemgetter(QUESTION_OBJ2_INDEX),
-                            split_questions))
+            obj2s = list(map(normalize_element,
+                        list(map(itemgetter(QUESTION_OBJ2_INDEX),
+                            split_questions))))
 
             if (len(set(pps)) == 1):
                 # If all questions for the predicate include the same pp attachemnt -
@@ -276,8 +275,8 @@ class Extraction:
         corresponding argument
         """
         # Parse question
-        wh, aux, sbj, trg, obj1, pp, obj2 = map(normalize_element,
-                                                question.split(' ')[:-1]) # Last split is the question mark
+        wh, aux, sbj, trg, obj1, pp, obj2 = list(map(normalize_element,
+                                                question.split(' ')[:-1])) # Last split is the question mark
 
         # Place preposition in argument
         # This is safer when dealing with n-ary arguments, as it's directly attaches to the

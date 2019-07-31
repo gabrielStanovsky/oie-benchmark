@@ -28,7 +28,7 @@ def get_pr(path):
     with open(path) as fin:
         # remove header line
         fin.readline()
-        [p, r] = zip(*[map(lambda x: float(x), line.strip().split('\t')) for line in fin])
+        [p, r] = list(zip(*[[float(x) for x in line.strip().split('\t')] for line in fin]))
         return p, r
     
 if __name__ == '__main__':
