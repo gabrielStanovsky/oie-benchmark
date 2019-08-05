@@ -72,6 +72,17 @@ class Benchmark:
                         y_true.append(1)
                         y_scores.append(predictedEx.confidence)
                         predictedEx.matched.append(output_fn)
+
+                        # Also mark any other predictions with the
+                        # same exact predicate as matched.
+                        # This is to support packages that do conjunction
+                        # splitting, and doesn't affect the results for
+                        # packages that don't.
+                        if predictedEx.splits_conjunctions:
+                            for otherPredictedEx in predictedExtractions:
+                                if otherPredictedEx.pred == predictedEx.pred:
+                                    otherPredictedEx.matched.append(output_fn)
+
                         found = True
                         break
                     

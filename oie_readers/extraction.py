@@ -7,7 +7,7 @@ import logging
 
 class Extraction:
     ''' holds sentence, single predicate and corresponding arguments '''
-    def __init__(self, pred, sent, confidence, question_dist = ''):
+    def __init__(self, pred, sent, confidence, question_dist = '', splits_conjunctions = False):
         self.pred = pred
         self.sent = sent
         self.args = []
@@ -17,6 +17,7 @@ class Extraction:
         self.indsForQuestions = defaultdict(lambda: set())
         self.is_mwp = False
         self.question_dist = question_dist
+        self.splits_conjunctions = splits_conjunctions
 
     def distArgFromPred(self, arg):
         assert(len(self.pred) == 2)
