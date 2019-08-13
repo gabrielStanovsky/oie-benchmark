@@ -43,8 +43,7 @@ Leave us a note at
 
 ## Requirements
 
-* Python 2.7, tested on Ubuntu.
-* For python3, use the [python3 branch](https://github.com/gabrielStanovsky/oie-benchmark/tree/python3) (h/t @jbecke).
+* Python 3
 * See required python packages [here](requirements.txt).
 
 Additional help can be found in the [FAQ section](faq.md).
